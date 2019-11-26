@@ -1,0 +1,79 @@
+# Installing tomcat in ubuntu : https://www.digitalocean.com/community/tutorials/how-to-install-apache-tomcat-8-on-ubuntu-16-04
+Setting up tomcat in Ubuntu system
+========================================
+ 1706  sudo apt-get update
+ 1707  sudo groupadd tomcat
+ 1708  sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+ 1709  cd /tmp
+ 1710  curl -O http://apache.mirrors.ionfish.org/tomcat/tomcat-8/v8.5.47/bin/apache-tomcat-8.5.47.tar.gz
+ 1711  sudo mkdir /opt/tomcat
+ 1712  sudo tar xzvf apache-tomcat-8*tar.gz -C /opt/tomcat --strip-components=1
+ 1713  cd /opt/tomcat
+ 1714  sudo chgrp -R tomcat /opt/tomcat
+ 1715  sudo chmod -R g+r conf
+ 1716  sudo chmod g+x conf
+ 1717  sudo chown -R tomcat webapps/ work/ temp/ logs/
+ 1718  sudo update-java-alternatives -l
+ 1719  sudo nano /etc/systemd/system/tomcat.service
+# input below data
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=network.target
+
+[Service]
+Type=forking
+
+Environment=JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre
+Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid
+Environment=CATALINA_HOME=/opt/tomcat
+Environment=CATALINA_BASE=/opt/tomcat
+Environment='CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
+Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
+
+ExecStart=/opt/tomcat/bin/startup.sh
+ExecStop=/opt/tomcat/bin/shutdown.sh
+
+User=tomcat
+Group=tomcat
+UMask=0007
+RestartSec=10
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+# change the port where tomcat is run  as 8090
+ 1720  sudo systemctl daemon-reload
+ 1721  sudo systemctl start tomcat
+ 1722  sudo systemctl status tomcat
+ 1723  sudo systemctl stop tomcat
+ # change server.sml file's connectopr port 8080 to 8085 as Jenkins is already running in the server at port 8080
+ 1732  exit
+ 1733  sudo systemctl start tomcat
+ 1734  sudo systemctl status tomcat
+
+# For running the scripted pipeline for an addressbook application
+# Install Pipeline Maven Integration Plugin
+# USe M3 installation in Jenkins
+
+common Errors
+========================
+# Make sure tomcat/webapps folder has write permissions
+Plugins you require to Install
+====================================
+# Pipeline Maven Integration Plugin
+# Build Pipeline Plugin
+# PMD Plug-in
+# Cobertura Plugin
+# Audit Trail
+Slave - Distributed Builds
+=================================
+# Jenkins slaves/agents are nothing just a small Java “Client” processes that connects to the “Master” Jenkins instance over the Java # Network Launch Protocol (JNLP).
+# install java in jenkins slave
+apt-get install openjdk-8-jdk
+
+Integrate with Git
+===================
+http://<ipaddress of jenkins master>:8080/github-webhook/ (push)
+
+
